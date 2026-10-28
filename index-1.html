@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pengu Commissions</title>
+<meta name="description" content="Request a custom Minecraft plugin, Roblox script, Discord bot or website from Pengu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: single column "work order" — intro, services, steps, then the request form as a ticket */
+:root {
+  --paper: #F4F7FA;
+  --card: #FFFFFF;
+  --ink: #13202E;
+  --muted: #5A6A7B;
+  --line: #D4DDE6;
+  --beak: #D9771F;
+  --beak-ink: #FFFFFF;
+  --ice: #DCEBF6;
+  --ok: #1E7A4C;
+  --err: #B3261E;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0D1520;
+    --card: #142131;
+    --ink: #E7EDF3;
+    --muted: #93A3B5;
+    --line: #26364A;
+    --beak: #F09A45;
+    --beak-ink: #1A1206;
+    --ice: #17304A;
+    --ok: #5CC98E;
+    --err: #FF8A80;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 var(--body);
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 56px;
+}
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.mark { font: 800 22px/1 var(--display); letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+.mark svg { width: 30px; height: 30px; flex: none; }
+.status {
+  font: 500 12px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
+}
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+
+.intro h1 {
+  font: 800 clamp(34px, 7vw, 56px)/1.02 var(--display);
+  letter-spacing: -0.03em; margin: 0 0 16px; text-wrap: balance;
+}
+.intro h1 em { font-style: normal; color: var(--beak); }
+.intro p { margin: 0 0 24px; max-width: 58ch; color: var(--muted); font-size: 18px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 600 16px/1 var(--body); text-decoration: none; cursor: pointer;
+  background: var(--beak); color: var(--beak-ink); border: 0;
+  padding: 15px 22px; border-radius: 10px;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--beak); outline-offset: 2px;
+}
+.btn[disabled] { opacity: 0.6; cursor: progress; }
+
+.label {
+  font: 500 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 18px;
+}
+h2 { font: 700 28px/1.15 var(--display); letter-spacing: -0.02em; margin: 0 0 20px; text-wrap: balance; }
+
+.services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.svc { background: var(--card); padding: 22px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.svc h3 { font: 700 19px/1.2 var(--display); margin: 0; }
+.svc p { margin: 0; color: var(--muted); font-size: 15px; }
+.svc .tag { font: 500 11px/1 var(--mono); letter-spacing: 0.06em; color: var(--beak); text-transform: uppercase; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; align-items: start; counter-increment: s; }
+.steps li::before {
+  content: counter(s); width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--ice); color: var(--ink);
+  font: 700 17px/1 var(--display);
+}
+.steps strong { display: block; font-weight: 600; }
+.steps span { color: var(--muted); font-size: 15px; }
+
+/* the ticket */
+.ticket { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.ticket-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 18px 22px; border-bottom: 1px dashed var(--line);
+}
+.ticket-head h2 { margin: 0; font-size: 24px; }
+.ref { font: 500 13px/1 var(--mono); color: var(--muted); letter-spacing: 0.04em; }
+form { padding: 22px; display: grid; gap: 20px; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.field { display: grid; gap: 7px; min-width: 0; }
+.field label { font-weight: 600; font-size: 15px; }
+.field .hint { color: var(--muted); font-size: 13px; font-weight: 400; }
+.req { color: var(--beak); }
+input, select, textarea {
+  width: 100%; font: 16px/1.4 var(--body); color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+}
+textarea { min-height: 150px; resize: vertical; }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--err); }
+.err { color: var(--err); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chips label {
+  font-weight: 500; font-size: 15px; cursor: pointer;
+  padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper);
+}
+.chips input:checked + label { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chips input:focus-visible + label { outline: 3px solid var(--beak); outline-offset: 2px; }
+.hp { position: absolute; left: -9999px; }
+.submit-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.note { color: var(--muted); font-size: 14px; margin: 0; flex: 1 1 220px; }
+.msg { padding: 14px 16px; border-radius: 10px; font-size: 15px; border: 1px solid; }
+.msg.bad { color: var(--err); border-color: var(--err); }
+.done { padding: 34px 22px; display: grid; gap: 10px; text-align: left; }
+.done h3 { font: 700 26px/1.15 var(--display); margin: 0; }
+.done p { margin: 0; color: var(--muted); }
+.done code { font: 500 15px var(--mono); color: var(--ink); background: var(--ice); padding: 2px 8px; border-radius: 6px; }
+
+footer { color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 20px; }
+
+@media (max-width: 560px) {
+  .services, .row { grid-template-columns: minmax(0, 1fr); }
+  .wrap { gap: 44px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn { transition: filter .15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="mark">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <ellipse cx="16" cy="17" rx="11" ry="13" fill="currentColor"/>
+        <ellipse cx="16" cy="20" rx="7" ry="9" fill="var(--paper)"/>
+        <circle cx="12.5" cy="11" r="1.6" fill="var(--paper)"/>
+        <circle cx="19.5" cy="11" r="1.6" fill="var(--paper)"/>
+        <path d="M13.5 14.5 L18.5 14.5 L16 17.5 Z" fill="var(--beak)"/>
+      </svg>
+      Pengu
+    </div>
+    <span class="status">Commissions open</span>
+  </header>
+
+  <section class="intro">
+    <h1>Need something built? <em>Tell me what it is.</em></h1>
+    <p>I make custom Minecraft plugins, Roblox scripts and games, Discord bots and websites. Send a request below and I'll reply on Discord with a price before any work starts.</p>
+    <a class="btn" href="#request">Start a request</a>
+  </section>
+
+  <section aria-labelledby="what">
+    <p class="label" id="what">What I make</p>
+    <div class="services">
+      <div class="svc">
+        <span class="tag">Paper · Java</span>
+        <h3>Minecraft plugins</h3>
+        <p>Custom items, SMP mechanics, admin tools, events and minigames for your server.</p>
+      </div>
+      <div class="svc">
+        <span class="tag">Roblox Studio · Luau</span>
+        <h3>Roblox scripts &amp; games</h3>
+        <p>Game systems, UI, data saving, shops and full game builds.</p>
+      </div>
+      <div class="svc">
+        <span class="tag">Discord</span>
+        <h3>Discord bots</h3>
+        <p>Moderation, tickets, roles, welcome messages and custom commands for your community.</p>
+      </div>
+      <div class="svc">
+        <span class="tag">HTML · CSS · JS</span>
+        <h3>Websites</h3>
+        <p>Landing pages and sites for servers, clans, communities and small projects.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="how">
+    <p class="label" id="how">How it works</p>
+    <ol class="steps">
+      <li><div><strong>Send your request</strong><span>Fill in the form with as much detail as you can.</span></div></li>
+      <li><div><strong>Get a quote on Discord</strong><span>I message you with a price and how long it'll take. Every job is priced individually.</span></div></li>
+      <li><div><strong>I build it</strong><span>Once you agree, I start work and keep you updated.</span></div></li>
+      <li><div><strong>You get your files</strong><span>Delivered with setup instructions, plus fixes if anything isn't working.</span></div></li>
+    </ol>
+  </section>
+
+  <section class="ticket" id="request" aria-labelledby="formtitle">
+    <div class="ticket-head">
+      <h2 id="formtitle">Request a commission</h2>
+      <span class="ref" id="refLabel">REQ-0000</span>
+    </div>
+
+    <form id="reqForm" action="https://formspree.io/f/xjyyrqrl" method="POST" novalidate>
+      <input type="hidden" name="_subject" value="New commission request">
+      <input type="hidden" name="reference" id="ref">
+      <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="row">
+        <div class="field">
+          <label for="discord">Discord username <span class="req">*</span></label>
+          <input id="discord" name="discord" autocomplete="username" placeholder="e.g. builder_jay" required>
+          <span class="err" id="discord-err" hidden></span>
+        </div>
+        <div class="field">
+          <label for="email">Email <span class="hint">(optional)</span></label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+          <span class="err" id="email-err" hidden></span>
+        </div>
+      </div>
+
+      <fieldset class="field" style="border:0;padding:0;margin:0">
+        <legend style="font-weight:600;font-size:15px;padding:0;margin-bottom:7px">What do you need? <span class="req">*</span></legend>
+        <div class="chips" id="serviceChips">
+          <input type="radio" name="service" id="s-mc" value="Minecraft plugin" required><label for="s-mc">Minecraft plugin</label>
+          <input type="radio" name="service" id="s-rbx" value="Roblox script/game"><label for="s-rbx">Roblox script/game</label>
+          <input type="radio" name="service" id="s-bot" value="Discord bot"><label for="s-bot">Discord bot</label>
+          <input type="radio" name="service" id="s-web" value="Website"><label for="s-web">Website</label>
+          <input type="radio" name="service" id="s-other" value="Other"><label for="s-other">Something else</label>
+        </div>
+        <span class="err" id="service-err" hidden></span>
+      </fieldset>
+
+      <div class="field">
+        <label for="title">Project name <span class="req">*</span></label>
+        <input id="title" name="title" placeholder="e.g. Custom kits plugin for my SMP" maxlength="120" required>
+        <span class="err" id="title-err" hidden></span>
+      </div>
+
+      <div class="field">
+        <label for="details">Describe what you want <span class="req">*</span></label>
+        <span class="hint" id="details-hint">Features, how it should work, game or server version, and anything it needs to work with.</span>
+        <textarea id="details" name="details" aria-describedby="details-hint" required></textarea>
+        <span class="err" id="details-err" hidden></span>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="deadline">Needed by <span class="hint">(optional)</span></label>
+          <input id="deadline" name="deadline" type="date">
+        </div>
+        <div class="field">
+          <label for="budget">Budget <span class="hint">(optional)</span></label>
+          <input id="budget" name="budget" placeholder="e.g. around £20">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="links">Links or examples <span class="hint">(optional)</span></label>
+        <input id="links" name="links" placeholder="Videos, screenshots or similar things you've seen">
+      </div>
+
+      <div class="msg bad" id="formMsg" role="alert" hidden></div>
+
+      <div class="submit-row">
+        <button class="btn" type="submit" id="sendBtn">Send request</button>
+        <p class="note">No payment now. I'll message you on Discord with a quote first.</p>
+      </div>
+    </form>
+
+    <div class="done" id="doneBox" hidden>
+      <p class="label" style="margin:0">Request sent</p>
+      <h3>Thanks, I've got it.</h3>
+      <p>Your reference is <code id="doneRef"></code>. I'll message <strong id="doneDiscord"></strong> on Discord with a quote, usually within a couple of days. Keep your DMs open so my message gets through.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>made by Pengu</span>
+    <span>Questions? Message <strong>Pengu</strong> on Discord.</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var form = document.getElementById("reqForm");
+  var msg = document.getElementById("formMsg");
+  var btn = document.getElementById("sendBtn");
+
+  // Reference number shown on the ticket and sent with the request
+  var ref = "REQ-" + Date.now().toString(36).slice(-4).toUpperCase() + Math.floor(Math.random() * 90 + 10);
+  document.getElementById("ref").value = ref;
+  document.getElementById("refLabel").textContent = ref;
+
+  // Don't allow deadlines in the past
+  var today = new Date();
+  var iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  document.getElementById("deadline").min = iso;
+
+  function setErr(id, text) {
+    var el = document.getElementById(id + "-err");
+    var input = document.getElementById(id);
+    if (text) {
+      el.textContent = text; el.hidden = false;
+      if (input) input.setAttribute("aria-invalid", "true");
+    } else {
+      el.hidden = true;
+      if (input) input.removeAttribute("aria-invalid");
+    }
+    return !text;
+  }
+
+  function validate() {
+    var ok = true;
+    var d = form.discord.value.trim();
+    ok = setErr("discord", d ? "" : "Add your Discord username so I can send you a quote.") && ok;
+    var e = form.email.value.trim();
+    ok = setErr("email", !e || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) ? "" : "That email doesn't look right. Check it or leave it blank.") && ok;
+    var s = form.querySelector('input[name="service"]:checked');
+    ok = setErr("service", s ? "" : "Pick what kind of project this is.") && ok;
+    ok = setErr("title", form.title.value.trim() ? "" : "Give your project a short name.") && ok;
+    var det = form.details.value.trim();
+    ok = setErr("details", det.length >= 20 ? "" : "Add a bit more detail (at least a couple of sentences).") && ok;
+    return ok;
+  }
+
+  // Posts a copy of each request to your private Discord channel
+  var DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1565108571387990128/W2WvfNjQcG25MT0xReaA6UM9o-dlP8mIEwNM-m8ViIkohUXCpyU_DKPMru8Q0l5z0FzY";
+
+  function sendToDiscord() {
+    function v(name, max) {
+      var el = form.elements[name];
+      var val = el ? String(el.value || "").trim() : "";
+      if (!val) return "—";
+      return val.length > max ? val.slice(0, max - 1) + "…" : val;
+    }
+    var service = form.querySelector('input[name="service"]:checked');
+    var payload = {
+      username: "Pengu Commissions",
+      allowed_mentions: { parse: [] },
+      embeds: [{
+        title: v("title", 240),
+        description: v("details", 3900),
+        color: 0xD9771F,
+        fields: [
+          { name: "Discord", value: v("discord", 100), inline: true },
+          { name: "Service", value: service ? service.value : "—", inline: true },
+          { name: "Reference", value: ref, inline: true },
+          { name: "Needed by", value: v("deadline", 30), inline: true },
+          { name: "Budget", value: v("budget", 100), inline: true },
+          { name: "Email", value: v("email", 200), inline: true },
+          { name: "Links", value: v("links", 1000), inline: false }
+        ],
+        footer: { text: "New commission request" },
+        timestamp: new Date().toISOString()
+      }]
+    };
+    var body = new FormData();
+    body.append("payload_json", JSON.stringify(payload));
+    // no-cors: Discord gets the message; the page doesn't need the reply
+    fetch(DISCORD_WEBHOOK, { method: "POST", mode: "no-cors", body: body }).catch(function () {});
+  }
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    msg.hidden = true;
+    if (!validate()) {
+      var first = form.querySelector('[aria-invalid="true"]') || form.querySelector('input[name="service"]');
+      if (first) first.focus();
+      return;
+    }
+    if (form.action.indexOf("YOUR_FORM_ID") !== -1) {
+      msg.textContent = "This form isn't connected yet. Replace YOUR_FORM_ID in the page with your Formspree form ID.";
+      msg.hidden = false;
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+    sendToDiscord();
+    fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { "Accept": "application/json" }
+    }).then(function (res) {
+      if (res.ok) {
+        document.getElementById("doneRef").textContent = ref;
+        document.getElementById("doneDiscord").textContent = form.discord.value.trim();
+        form.hidden = true;
+        document.getElementById("doneBox").hidden = false;
+        document.getElementById("doneBox").scrollIntoView({ block: "center" });
+        return;
+      }
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        var text = data && data.errors && data.errors.length
+          ? data.errors.map(function (x) { return x.message; }).join(" ")
+          : "The request didn't go through. Try again in a minute.";
+        throw new Error(text);
+      });
+    }).catch(function (err) {
+      msg.textContent = (err && err.message && err.message !== "Failed to fetch")
+        ? err.message
+        : "Couldn't reach the server. Check your connection and try again.";
+      msg.hidden = false;
+    }).finally(function () {
+      btn.disabled = false;
+      btn.textContent = "Send request";
+    });
+  });
+
+  // Clear an error as soon as the field is fixed
+  ["discord", "email", "title", "details"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (this.getAttribute("aria-invalid")) setErr(id, "");
+    });
+  });
+  document.getElementById("serviceChips").addEventListener("change", function () { setErr("service", ""); });
+})();
+</script>
+</body>
+</html>
